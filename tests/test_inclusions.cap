@@ -1,0 +1,10 @@
+# tests/test_inclusions.cap
+# Verify there is no way to include files or evaluate strings
+r1 = try(|| eval("1 + 1"))
+println("eval error: " + str(not r1["ok"]))
+
+r2 = try(|| import("math"))
+println("import error: " + str(not r2["ok"]))
+
+r3 = try(|| load("tests/test_types.cap"))
+println("load error: " + str(not r3["ok"]))

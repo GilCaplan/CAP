@@ -1,0 +1,29 @@
+# Rust & Build Artifacts
+/target/
+**/*.rs.bk
+*.swp
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# AI Agents & IDE
+.claude/
+.gemini/
+.idea/
+.vscode/
+
+# Project Specific (Not Core Language)
+/inputs/
+/programs/
+/memory/
+
+# Temp test output files
+tests/temp_test_*.txt
+tests/temp_*.txt
+*.tmp
+
+# Analysis & Audit Files created during recent work
+CAP_AUDIT.md
+RESEARCH.md
+TOKEN_ANALYSIS.md

@@ -1,0 +1,26 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+# Pipeline inside match arm
+val = 2
+res = match val,
+  1 -> "one",
+  2 -> (
+    [1, 2, 3]
+    |> map(|x| x * 2)
+    |> sum
+  ),
+  _ -> "other"
+assert(res == 12, "pipeline in match")
+
+# Class with recursive method
+# wait, methods cannot easily refer to themselves by name since they are in a map, 
+# but they can capture a recursive lambda defined before returning the map!
+# Actually, the method is a closure, but it's assigned to a map key, so it doesn't have a name in its own scope.
+# The user can just define a recursive lambda inside the method.
+class Tree(val, left, right),
+  sum = || val + (if left != null then left["sum"]() else 0) + (if right != null then right["sum"]() else 0)
+
+t = Tree(5, Tree(3, null, null), Tree(7, null, null))
+assert(t["sum"]() == 15, "recursive class method")
+
+println("feature interactions test completed.")

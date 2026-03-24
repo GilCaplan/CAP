@@ -1,0 +1,24 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+# Basic if/then/else
+x = 10
+res1 = if x > 5 then "large" else "small"
+assert(res1 == "large", "basic if true")
+
+res2 = if x < 5 then "large" else "small"
+assert(res2 == "small", "basic if false")
+
+# if/elif/else
+score = 85
+grade = if score >= 90 then "A" elif score >= 80 then "B" elif score >= 70 then "C" else "F"
+assert(grade == "B", "elif chain")
+
+score2 = 60
+grade2 = if score2 >= 90 then "A" elif score2 >= 80 then "B" elif score2 >= 70 then "C" else "F"
+assert(grade2 == "F", "elif chain else fallback")
+
+# Missing else (Testing whether syntax error happens)
+# Oh, we can't test syntax error parsing inside same file because it won't execute.
+# So we'll skip syntax error tests to keep it simple, or make a separate file `tests/test_if_no_else.cap`
+
+println("if/elif/else test completed.")

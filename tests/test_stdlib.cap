@@ -1,0 +1,51 @@
+# tests/test_stdlib.cap
+# Comprehensive test for extended stdlib modules
+
+println("--- Testing YAML & TOML ---")
+cfg = yaml_parse("name: Alice\nage: 30")
+println("YAML Name: {cfg.name}")
+y_s = yaml_stringify(cfg)
+println("YAML String: {y_s}")
+
+tm = toml_parse("[db]\nhost = \"localhost\"")
+println("TOML Host: {tm.db.host}")
+t_s = toml_stringify(tm)
+println("TOML String: {t_s}")
+
+println("\n--- Testing FS & OS ---")
+println("CWD: {os_cwd()}")
+println("User: {os_username()}")
+fs_write("test_tmp.txt", "hello stdlib")
+content = fs_read("test_tmp.txt")
+println("FS Read: {content}")
+println("Exists: {fs_exists(\"test_tmp.txt\")}")
+fs_delete("test_tmp.txt")
+
+println("\n--- Testing Time ---")
+now = time_now()
+println("Year: {time_year(now)}")
+println("Formatted: {time_format(now, \"%Y-%m-%d\")}")
+
+println("\n--- Testing SQL ---")
+sql_open(":memory:")
+sql_exec("CREATE TABLE t (id INT, val TEXT)")
+sql_exec("INSERT INTO t VALUES (1, 'cap')")
+res = sql_query("SELECT * FROM t", [])
+println("SQL Result: {res[0].val}")
+sql_close()
+
+println("\n--- Testing Stream & Gzip ---")
+gz_write("test.gz", "compressed data")
+gz_c = gz_read("test.gz")
+println("Gzip Read: {gz_c}")
+fs_delete("test.gz")
+
+println("\n--- Testing Task ---")
+r = task_measure("echo 'measuring shell'")
+println("Measure: {r.elapsed_ms}ms")
+
+println("\n--- Testing JSON (Extra) ---")
+j = json_parse("{{\"a\": [1,2,3]}}")
+println("JSON Array Len: {j.a.len}")
+
+println("\nAll core stdlib tests initiated!")

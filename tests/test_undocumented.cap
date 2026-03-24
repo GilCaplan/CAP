@@ -1,0 +1,27 @@
+# tests/test_undocumented.cap
+# Testing the "hidden" power builtins discovered in the source
+
+# 1. JSON
+data = {"a": 1, "b": [true, null]}
+json_str = json_stringify(data)
+println("JSON Stringify: " + json_str)
+parsed = json_parse(json_str)
+println("JSON Parse 'a': " + str(parsed["a"]))
+
+# 2. Sys / Shell
+host = shell("hostname")
+println("Shell hostname: " + host["stdout"].trim)
+
+# 3. Regex
+re_res = regex_find_all("(?i)cap", "Cap is cool, cap is fun")
+println("Regex find all: " + str(re_res))
+
+# 4. Python Bridge
+# This is wild -- bridging to python for math or complex tasks
+py_res = python("print(2**100)")
+println("Python 2**100: " + py_res)
+
+# 5. Net (requires internet, let's just check if it exists)
+# http_get returns a map {status, body, headers}
+# We'll try a local-ish or reliable URL if possible, or just check type
+# println("HTTP Get type: " + type(http_get))

@@ -1,0 +1,13 @@
+# tests/test_map_build.cap — dynamic map population (BUG-11 fixed)
+
+# Use from_pairs for building a map from a list of (k, v) pairs
+m1 = from_pairs([("a", 1), ("b", 2)])
+println(m1["a"])   # 1
+println(m1["b"])   # 2
+
+# Use set() to mutate a map inside each
+m2 = {}
+items = [("x", 10), ("y", 20)]
+items |> each(|t| set(m2, t[0], t[1]))
+println(m2["x"])   # 10
+println(m2["y"])   # 20

@@ -1,0 +1,9 @@
+# test_map_keys_types.cap
+# Integer keys work
+m = {1: "one", 2: "two"}
+println("int key: " + str(m[1]))   # one
+
+# Tuple keys work (tuples are immutable, so hashable)
+m2 = from_pairs([((1, 2), "nested"), ((3, 4), "other")])
+println("tuple key: " + str(m2[(1, 2)]))   # nested
+println("tuple key2: " + str(m2[(3, 4)]))   # other

@@ -1,0 +1,63 @@
+# tests/test_brainfuck.cap
+
+# A simple Brainfuck interpreter in Cap to stress functional constructs
+
+code = "+++++[>++++++++<-]>." # prints '(' (ASCII 40)
+# ASCII 40 is '('
+# initial tape: 10 cells
+tape_size = 10
+init_tape = 0..tape_size |> map(|_| 0)
+
+# helper to "update" tape functionally
+update_tape = |t, p, v| 0..tape_size |> map(|i| if i == p then v else t[i])
+
+# recursive execution step
+# returns output string
+run_step = |ip, ptr, tape, out| (
+  if ip >= code.len then out else (
+    (|c|
+      match c,
+        ">" -> run_step(ip + 1, ptr + 1, tape, out),
+        "<" -> run_step(ip + 1, ptr - 1, tape, out),
+        "+" -> run_step(ip + 1, ptr, update_tape(tape, ptr, tape[ptr] + 1), out),
+        "-" -> run_step(ip + 1, ptr, update_tape(tape, ptr, tape[ptr] - 1), out),
+        "." -> run_step(ip + 1, ptr, tape, out + "[" + str(tape[ptr]) + "]"),
+        "[" -> (
+           if tape[ptr] == 0 then (
+             # find matching ]
+             # we will just do a tiny recursive search
+             (|find_close|
+               find_close(find_close, ip + 1, 1)
+             )(|self, temp_ip, depth|
+               if depth == 0 then run_step(temp_ip, ptr, tape, out)
+               elif code.chars[temp_ip] == "[" then self(self, temp_ip + 1, depth + 1)
+               elif code.chars[temp_ip] == "]" then self(self, temp_ip + 1, depth - 1)
+               else self(self, temp_ip + 1, depth)
+             )
+           ) else (
+             run_step(ip + 1, ptr, tape, out)
+           )
+        ),
+        "]" -> (
+           if tape[ptr] != 0 then (
+             # find matching [
+             (|find_open|
+               find_open(find_open, ip - 1, 1)
+             )(|self, temp_ip, depth|
+               if depth == 0 then run_step(temp_ip + 1, ptr, tape, out)
+               elif code.chars[temp_ip] == "]" then self(self, temp_ip - 1, depth + 1)
+               elif code.chars[temp_ip] == "[" then self(self, temp_ip - 1, depth - 1)
+               else self(self, temp_ip - 1, depth)
+             )
+           ) else (
+             run_step(ip + 1, ptr, tape, out)
+           )
+        ),
+        _ -> run_step(ip + 1, ptr, tape, out)
+    )(code.chars[ip])
+  )
+)
+
+# Start!
+res = run_step(0, 0, init_tape, "")
+println("Brainfuck Output: " + res)

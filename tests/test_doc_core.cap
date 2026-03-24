@@ -1,0 +1,97 @@
+# tests/test_docs.cap
+println("==== Testing Core Builtins ====")
+
+# print / println
+print("print ok! \n")
+println("println ok!")
+
+# type casting
+assert_true = |name, val| if not bool(val) then error("Assertion failed: {name}") else println("  PASS: {name}")
+
+assert_true("int()", int("42") == 42)
+assert_true("float()", float("3.14") > 3.0)
+assert_true("str()", str(42) == "42")
+assert_true("bool()", bool(1) and not bool(0))
+
+# len, type, repr
+assert_true("len(list)", len([1, 2, 3]) == 3)
+assert_true("len(str)", len("abc") == 3)
+assert_true("type()", type(42) == "int")
+assert_true("repr()", repr([1, 2]) == "[1, 2]")
+
+# range
+r1 = range(3)
+assert_true("range(n)", r1.len == 3 and r1[2] == 2)
+r2 = range(2, 5)
+assert_true("range(a, b)", r2.len == 3 and r2[0] == 2)
+r3 = range(0, 10, 2)
+assert_true("range(a, b, s)", r3.len == 5 and r3[1] == 2)
+
+# try/catch error
+res = try(|| error("test err"))
+assert_true("try(error)", not res.ok and contains(res.error, "test err"))
+
+# dictionaries
+m = {"a": 1, "b": 2}
+assert_true("keys()", keys(m).len == 2)
+assert_true("values()", values(m).len == 2)
+assert_true("items()", items(m).len == 2)
+
+set(m, "c", 3)
+assert_true("set()", m.c == 3)
+
+m2 = from_pairs([("x", 10), ("y", 20)])
+assert_true("from_pairs()", m2.x == 10)
+
+m3 = merge(m, m2)
+assert_true("merge()", m3.a == 1 and m3.x == 10)
+
+println("\n==== Testing Lists ====")
+nums = [1, 2, 3, 4, 5]
+
+assert_true("map()", (nums |> map(|x| x*2))[0] == 2)
+assert_true("filter()", (nums |> filter(|x| x>3)).len == 2)
+assert_true("reduce()", (nums |> reduce(|a,b| a+b)) == 15)
+
+tap_var = [0]
+nums |> tap(|xs| set(tap_var, 0, xs.len))
+assert_true("tap()", tap_var[0] == 5)
+
+assert_true("sort()", ([3,1,2] |> sort)[0] == 1)
+assert_true("sort_by()", ([{"n":2}, {"n":1}] |> sort_by(|x| x.n))[0].n == 1)
+assert_true("reverse()", ([1,2] |> reverse)[0] == 2)
+assert_true("zip()", (zip([1], [2]))[0][0] == 1)
+assert_true("flatten()", (flatten([[1], [2]]))[1] == 2)
+
+assert_true("first()", first(nums) == 1)
+assert_true("last()", last(nums) == 5)
+assert_true("find()", find(nums, |x| x == 3) == 3)
+assert_true("any()", any(nums, |x| x > 4))
+assert_true("all()", all(nums, |x| x > 0))
+
+assert_true("enumerate()", enumerate(nums)[0][0] == 0)
+
+mut_list = [1]
+append(mut_list, 2)
+assert_true("append()", mut_list.len == 2)
+extend(mut_list, [3, 4])
+assert_true("extend()", mut_list.len == 4)
+
+assert_true("sum()", sum([1, 2, 3]) == 6)
+assert_true("min()", min([3, 1, 2]) == 1)
+assert_true("max()", max([3, 1, 2]) == 3)
+
+println("\n==== Testing Strings ====")
+s = "  hello world  "
+assert_true("split()", split(s, " ").len == 6)
+assert_true("join()", join(["a", "b"], ",").len == 3)
+assert_true("trim", s.trim == "hello world")
+assert_true("upper", s.upper == "  HELLO WORLD  ")
+assert_true("replace()", replace("abc", "b", "x") == "axc")
+assert_true("contains()", contains("abc", "b"))
+assert_true("starts_with()", starts_with("abc", "a"))
+assert_true("ends_with()", ends_with("abc", "c"))
+assert_true("lines", "a\nb".lines.len == 2)
+assert_true("chars", "ab".chars.len == 2)
+
+println("\nAll Core/List/String tests passed!")

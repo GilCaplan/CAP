@@ -1,0 +1,57 @@
+# functions.cap — functional patterns and closures
+# Run: cap functions.cap
+
+# ── Closures capture their environment ───────────────────────────────────────
+make_adder = |n| |x| x + n
+add5  = make_adder(5)
+add10 = make_adder(10)
+println("add5(3)  =", add5(3))
+println("add10(3) =", add10(3))
+
+# ── Higher-order composition ─────────────────────────────────────────────────
+compose = |f, g| |x| f(g(x))
+double    = |x| x * 2
+increment = |x| x + 1
+double_then_inc = compose(increment, double)
+println("double_then_inc(4) =", double_then_inc(4))
+
+# ── Memoization pattern ───────────────────────────────────────────────────────
+# (Simple recursive fibonacci via closures)
+fib = |n| if n <= 1 then n else fib(n - 1) + fib(n - 2)
+println("fib(10) =", fib(10))
+
+# ── Pipeline composition ──────────────────────────────────────────────────────
+normalize  = |s| s |> trim |> lower
+clean_name = |s| s |> normalize |> replace(" ", "_")
+println(clean_name("  Alice  Smith  "))
+
+# ── Pattern matching over types ───────────────────────────────────────────────
+describe = |x| match type(x),
+  "int"      -> "integer: {x}",
+  "float"    -> "float: {x}",
+  "str"      -> "string: \"{x}\"",
+  "bool"     -> "bool: {x}",
+  "list"     -> "list with {len(x)} items",
+  "null"     -> "nothing",
+  _          -> "something else"
+
+println(describe(42))
+println(describe(3.14))
+println(describe("hello"))
+println(describe(true))
+println(describe([1, 2, 3]))
+println(describe(null))
+
+# ── Partial application via closures ─────────────────────────────────────────
+multiply_by = |n| |x| x * n
+triple   = multiply_by(3)
+quadruple = multiply_by(4)
+
+result = range(1, 6) |> map(triple)
+println("triples:", result)
+
+# ── Zip and combine ───────────────────────────────────────────────────────────
+xs = [1, 2, 3, 4, 5]
+ys = [10, 20, 30, 40, 50]
+dot_product = zip(xs, ys) |> map(|pair| pair[0] * pair[1]) |> sum
+println("dot product:", dot_product)

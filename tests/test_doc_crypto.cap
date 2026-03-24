@@ -1,0 +1,49 @@
+# tests/test_doc_crypto.cap
+
+assert_true = |name, val| if not bool(val) then error("Assertion failed: {name}") else println("  PASS: {name}")
+
+println("==== Testing Crypto ====")
+
+assert_true("hash_sha256", hash_sha256("hello").len == 64)
+assert_true("hash_md5", hash_md5("data").len == 32)
+assert_true("hash_sha512", hash_sha512("data").len == 128)
+
+fs_write("test_hash.bin", "data")
+assert_true("hash_file", hash_file("test_hash.bin").len == 64)
+fs_delete("test_hash.bin")
+
+assert_true("hmac_sha256", hmac_sha256("secret", "msg").len == 64)
+
+assert_true("b64_encode", b64_encode("hello") == "aGVsbG8=")
+assert_true("b64_decode", b64_decode("aGVsbG8=") == "hello")
+assert_true("hex_encode", hex_encode("hi") == "6869")
+assert_true("hex_decode", hex_decode("6869") == "hi")
+
+assert_true("uuid_v4", uuid_v4().len == 36)
+
+r = rand_int(1, 100)
+assert_true("rand_int", r >= 1 and r <= 100)
+f = rand_float()
+assert_true("rand_float", f >= 0.0 and f < 1.0)
+assert_true("rand_bytes", rand_bytes(16).len == 32)
+assert_true("rand_choice", rand_choice([1, 2, 3]) > 0)
+assert_true("rand_shuffle", rand_shuffle([1, 2, 3]).len == 3)
+
+pb = pbkdf2_hash("password")
+assert_true("pbkdf2_hash", pb.hash.len > 0 and pb.salt.len > 0)
+assert_true("pbkdf2_verify", pbkdf2_verify("password", pb.hash, pb.salt))
+
+println("\n==== Testing Regex ====")
+
+assert_true("regex_match", regex_match("^[0-9]+$", "123"))
+assert_true("regex_find", regex_find("[a-z]+", "123abc456") == "abc")
+assert_true("regex_find_all", regex_find_all("[a-z]", "a1b2c").len == 3)
+assert_true("regex_replace", regex_replace("[0-9]", "X", "a1b2") == "aXbX")
+
+println("\n==== Testing Vectors (Native) ====")
+
+assert_true("vec_cosine_sim", vec_cosine_sim([1.0, 0.0], [0.0, 1.0]) == 0.0)
+assert_true("vec_dot", vec_dot([1.0, 2.0], [3.0, 4.0]) == 11.0)
+assert_true("vec_norm", vec_norm([3.0, 4.0]) == 5.0)
+
+println("\nAll Crypto / Regex / Vector tests passed!")

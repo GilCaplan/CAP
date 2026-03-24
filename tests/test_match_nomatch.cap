@@ -1,0 +1,13 @@
+# tests/test_match_nomatch.cap — no match arm matched raises RuntimeError
+val = 5
+r = try(|| match val,
+  1 -> "one",
+  2 -> "two")
+println(r["ok"])   # false — no arm matched
+
+# With wildcard it works
+res = match val,
+  1 -> "one",
+  2 -> "two",
+  _ -> "other"
+println(res)   # other

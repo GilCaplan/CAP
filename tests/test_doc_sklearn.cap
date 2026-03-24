@@ -1,0 +1,67 @@
+# tests/test_doc_sklearn.cap
+
+assert_true = |name, val| if not bool(val) then error("Assertion failed: {name}") else println("  PASS: {name}")
+
+println("==== Testing Scikit-Learn (sklearn_*) ====")
+
+X = [[1.0], [2.0], [3.0], [4.0], [5.0], [6.0]]
+y = [0, 0, 0, 1, 1, 1]
+
+# Split
+split = sklearn_train_test_split(X, y, {"test_size": 0.33, "random_state": 42})
+assert_true("sklearn_train_test_split", split.X_train.len == 4 and split.X_test.len == 2)
+
+# Train
+model = sklearn_train(split.X_train, split.y_train, {"model": "random_forest", "n_estimators": 10, "random_state": 42})
+assert_true("sklearn_train", type(model.model) == "str" and model.model_name == "random_forest")
+
+# Predict & Score
+preds = sklearn_predict(model, split.X_test)
+assert_true("sklearn_predict", preds.len == 2)
+score = sklearn_score(model, split.X_test, split.y_test)
+assert_true("sklearn_score", score >= 0.0)
+
+# Metrics
+metrics = sklearn_metrics(split.y_test, preds)
+assert_true("sklearn_metrics", metrics.accuracy >= 0.0)
+
+# Feature Importance
+fi = sklearn_feature_importance(model)
+assert_true("sklearn_feature_importance", fi.len == 1 and fi[0].importance >= 0.0)
+
+# Preprocessing
+X_scaled = sklearn_scale(X)
+assert_true("sklearn_scale", X_scaled.X_scaled[0][0] != 1.0)
+X_norm = sklearn_normalize(X)
+assert_true("sklearn_normalize", X_norm[0][0] == 1.0)
+encoded = sklearn_encode_labels(["cat", "dog", "cat"])
+assert_true("sklearn_encode", encoded.encoded[0] == 0 and encoded.encoded[2] == 0 and encoded.encoded[1] == 1)
+
+# Impute
+# X_nan = [[1.0], [null], [3.0]]
+# X_imp = sklearn_impute(X_nan, "mean")
+# assert_true("sklearn_impute", X_imp[1][0] == 2.0)
+
+# Clustering
+labels_km = sklearn_kmeans(X, 2)
+assert_true("sklearn_kmeans", labels_km.labels.len == 6)
+labels_db = sklearn_dbscan(X, {"eps": 1.5, "min_samples": 2})
+assert_true("sklearn_dbscan", labels_db.labels.len == 6)
+
+# Persistence
+sklearn_save(model, "test_model.pkl")
+assert_true("sklearn_save", fs_exists("test_model.pkl"))
+model_loaded = sklearn_load("test_model.pkl")
+preds2 = sklearn_predict(model_loaded, split.X_test)
+assert_true("sklearn_load", preds2.len == 2)
+fs_delete("test_model.pkl")
+
+# Tuning
+cv = sklearn_cross_val({"model": "logistic", "random_state": 42}, X, y, {"cv": 2})
+assert_true("sklearn_cross_val", cv.scores.len == 2)
+
+param_grid = {"model": "random_forest", "n_estimators": [5, 10]}
+best = sklearn_grid_search(param_grid, X, y, {"cv": 2})
+assert_true("sklearn_grid_search", best.best_score >= 0.0)
+
+println("\nAll Scikit-Learn tests passed!")

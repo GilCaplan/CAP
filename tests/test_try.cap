@@ -1,0 +1,4 @@
+# tests/test_try.cap
+# RESEARCH.md suggests `try` might exist. Let's test error-handling.
+res = try(|| read("missing.txt"))
+println(res)

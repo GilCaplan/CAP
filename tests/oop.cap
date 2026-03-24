@@ -1,0 +1,69 @@
+# oop.cap — OOP via class syntax (desugars to map+lambda)
+# Run: cap oop.cap
+
+# ── Point class ───────────────────────────────────────────────────────────────
+class Point(x, y),
+  get_x = || x,
+  get_y = || y,
+  dist  = || (x*x + y*y) ** 0.5,
+  add   = |other| Point(x + other["get_x"](), y + other["get_y"]()),
+  scale = |n| Point(x * n, y * n),
+  str   = || "({x}, {y})"
+
+p1 = Point(3, 4)
+p2 = Point(1, 2)
+p3 = p1["add"](p2)
+
+println("p1:", p1["str"]())
+println("p2:", p2["str"]())
+println("p3 = p1 + p2:", p3["str"]())
+println("dist(p1):", p1["dist"]())
+println("p1 * 3:", p1["scale"](3)["str"]())
+
+# ── Stack class ───────────────────────────────────────────────────────────────
+# Immutable stack — push/pop return new stacks
+# pop removes the last pushed item (top of stack)
+class Stack(items),
+  push  = |item| Stack(append(items, item)),
+  pop   = || Stack(items |> enumerate |> filter(|p| p[0] < len(items) - 1) |> map(|p| p[1])),
+  peek  = || last(items),
+  empty = || len(items) == 0,
+  size  = || len(items),
+  str   = || "Stack{items}"
+
+s0 = Stack([])
+s1 = s0["push"](10)
+s2 = s1["push"](20)
+s3 = s2["push"](30)
+
+println("stack size:", s3["size"]())
+println("stack top:", s3["peek"]())
+println("stack:", s3["str"]())
+s4 = s3["pop"]()
+println("after pop size:", s4["size"]())
+println("after pop top:", s4["peek"]())
+
+# ── Counter class ─────────────────────────────────────────────────────────────
+class Counter(n),
+  inc   = || Counter(n + 1),
+  dec   = || Counter(n - 1),
+  reset = || Counter(0),
+  value = || n,
+  str   = || "Counter({n})"
+
+c = Counter(0)
+c = c["inc"]()
+c = c["inc"]()
+c = c["inc"]()
+println("counter:", c["str"]())
+c = c["dec"]()
+println("after dec:", c["str"]())
+
+# ── Inheritance-style via composition ─────────────────────────────────────────
+class ColorPoint(x, y, color),
+  dist  = || (x*x + y*y) ** 0.5,
+  str   = || "({x}, {y}, {color})"
+
+cp = ColorPoint(3, 4, "red")
+println("color point:", cp["str"]())
+println("dist:", cp["dist"]())

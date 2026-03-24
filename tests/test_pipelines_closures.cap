@@ -1,0 +1,20 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+nums = [1, 2, 3, 4]
+res1 = nums |> map(|x| x * 2) |> filter(|x| x > 4)
+assert(res1[0] == 6, "pipeline with map and filter")
+
+# multiline pipeline in parens
+res2 = (
+  nums
+  |> map(|x| x * 3)
+  |> sum
+)
+assert(res2 == 30, "multiline pipeline")
+
+# Closures capturing local variables
+make_adder = |n| |x| x + n
+add5 = make_adder(5)
+assert(add5(3) == 8, "closure capturing scope")
+
+println("pipelines and closures test completed.")

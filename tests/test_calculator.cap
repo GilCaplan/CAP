@@ -1,0 +1,22 @@
+# tests/test_calculator.cap
+println("Starting Calculator...")
+
+calc_match = |a, op, b| match op,
+  "+" -> a + b,
+  "-" -> a - b,
+  "*" -> a * b,
+  "/" -> a / b,
+  "**" -> a ** b,
+  "%" -> int(a) % int(b),
+  _ -> error("Unknown operator " + op)
+
+evaluate_parts = |parts| if parts.len != 3 then error("Invalid") else calc_match(float(parts[0]), parts[1], float(parts[2]))
+
+evaluate = |expr| evaluate_parts(split(trim(expr), " "))
+
+println(evaluate("3.5 + 2"))
+println(evaluate("10 / 2"))
+println(evaluate("2 ** 8"))
+println(evaluate("7 % 3"))
+
+println("Calculator tests complete")

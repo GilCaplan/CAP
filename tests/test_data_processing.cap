@@ -1,0 +1,34 @@
+# tests/test_data_processing.cap
+
+csv = "name,age,score\nAlice,30,95\nBob,22,88\nCharlie,,\nDave,25,72"
+
+linesList = csv |> lines
+header = linesList[0] |> split(",")
+
+# process rows
+rows = 1..linesList.len |> map(|i| linesList[i]) |> filter(|l| l != "")
+
+parsed = rows |> map(|row|
+  (|parts|
+    (|name, age_str, score_str|
+      (|age, score|
+         {"name": name, "age": age, "score": score}
+      )(if age_str == "" then null else int(age_str), if score_str == "" then null else int(score_str))
+    )(parts[0], parts[1], parts[2])
+  )(split(row, ","))
+)
+
+# filter valid scores
+valid = parsed |> filter(|u| u["score"] != null)
+
+# get average score
+total = valid |> map(|u| u["score"]) |> reduce(|acc, s| acc + s)
+avg = total / valid.len
+
+println("Average valid score: {avg}")
+
+# edge cases on list/string
+empty_str = ""
+println(empty_str |> split(","))
+
+println("Data processing complete")

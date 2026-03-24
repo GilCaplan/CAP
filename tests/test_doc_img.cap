@@ -1,0 +1,84 @@
+# tests/test_doc_img.cap
+
+assert_true = |name, val| if not bool(val) then error("Assertion failed: {name}") else println("  PASS: {name}")
+
+println("==== Testing Image Processing (img_*) ====")
+
+# Create a 2x2 RGB image array
+pixels = [
+  [[255, 0, 0], [0, 255, 0]],
+  [[0, 0, 255], [255, 255, 0]]
+]
+
+img_from_array(pixels, "test_base.png", "RGB")
+assert_true("img_from_array", fs_exists("test_base.png"))
+
+# Metadata
+info = img_info("test_base.png")
+assert_true("img_info", info.width == 2 and info.height == 2 and info.mode == "RGB")
+assert_true("img_size", img_size("test_base.png").width == 2)
+assert_true("img_mode", img_mode("test_base.png") == "RGB")
+
+# Arrays
+arr = img_to_array("test_base.png")
+assert_true("img_to_array", arr.len == 2 and arr[0].len == 2)
+p_list = img_pixels("test_base.png")
+assert_true("img_pixels", p_list.len == 4 and p_list[0][0] == 255)
+
+# Transforms
+img_save("test_base.png", "test_copy.jpg")
+assert_true("img_save", fs_exists("test_copy.jpg"))
+
+img_resize("test_base.png", "test_resized.png", 10, 10)
+assert_true("img_resize", img_size("test_resized.png").width == 10)
+
+img_crop("test_resized.png", "test_crop.png", 0, 0, 5, 5)
+assert_true("img_crop", img_size("test_crop.png").width == 5)
+
+img_rotate("test_base.png", "test_rot.png", 90)
+assert_true("img_rotate", fs_exists("test_rot.png"))
+
+img_flip("test_base.png", "test_flip.png", "horizontal")
+assert_true("img_flip", fs_exists("test_flip.png"))
+
+img_grayscale("test_base.png", "test_gray.png")
+assert_true("img_grayscale", img_mode("test_gray.png") == "L" or img_mode("test_gray.png") == "RGB")
+
+img_blur("test_base.png", "test_blur.png", 2.0)
+assert_true("img_blur", fs_exists("test_blur.png"))
+
+img_brightness("test_base.png", "test_bright.png", 1.5)
+assert_true("img_brightness", fs_exists("test_bright.png"))
+
+img_contrast("test_base.png", "test_contrast.png", 1.2)
+assert_true("img_contrast", fs_exists("test_contrast.png"))
+
+img_thumbnail("test_resized.png", "test_thumb.png", 4)
+assert_true("img_thumbnail", img_size("test_thumb.png").width <= 4)
+
+img_convert("test_base.png", "test_conv.png", "RGBA")
+assert_true("img_convert", img_mode("test_conv.png") == "RGBA")
+
+img_draw_text("test_resized.png", "test_txt.png", "Hi", 1, 1, {"font_size": 10, "color": "white"})
+assert_true("img_draw_text", fs_exists("test_txt.png"))
+
+img_paste("test_resized.png", "test_base.png", "test_paste.png", 2, 2)
+assert_true("img_paste", fs_exists("test_paste.png"))
+
+# Cleanup
+fs_delete("test_base.png")
+fs_delete("test_copy.jpg")
+fs_delete("test_resized.png")
+fs_delete("test_crop.png")
+fs_delete("test_rot.png")
+fs_delete("test_flip.png")
+fs_delete("test_gray.png")
+fs_delete("test_blur.png")
+fs_delete("test_bright.png")
+fs_delete("test_contrast.png")
+fs_delete("test_thumb.png")
+fs_delete("test_conv.png")
+fs_delete("test_txt.png")
+fs_delete("test_paste.png")
+
+println("\nAll Image Processing tests passed!")

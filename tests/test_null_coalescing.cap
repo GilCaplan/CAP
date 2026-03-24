@@ -1,0 +1,20 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+# Null coalescing operator ??
+a = null
+b = a ?? 5
+assert(b == 5, "null ?? 5")
+
+c = 10
+d = c ?? 5
+assert(d == 10, "10 ?? 5")
+
+# Chaining
+e = null ?? null ?? 42
+assert(e == 42, "chaining null coalesce")
+
+# Short-circuiting - if right side throws, it shouldn't be evaluated when left is non-null
+safe = 10 ?? error("Should not evaluate")
+assert(safe == 10, "short-circuiting")
+
+println("null coalescing test completed.")

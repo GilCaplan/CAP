@@ -1,0 +1,35 @@
+# tests/test_new_features.cap
+
+# 1. Test from_pairs edge case
+r1 = try(|| from_pairs([1, 2, 3]))
+println("from_pairs([1, 2, 3]) error: " + str(not r1["ok"]))
+
+# 2. Test merge edge case
+r2 = try(|| merge({"a": 1}, 5))
+println("merge with non-map error: " + str(not r2["ok"]))
+
+# 3. Test set edge case
+r3 = try(|| set(42, "key", "val"))
+println("set on int error: " + str(not r3["ok"]))
+
+# 4. Test string slice out of bounds
+r4 = try(|| "abc"[1..5])
+println("slice out of bounds error: " + str(not r4["ok"]))
+
+# 5. Test invalid range slice
+r5 = try(|| [1,2,3][5..1])
+println("reverse slice error: " + str(not r5["ok"]))
+
+# 6. Test deep extends
+class A(x), name = || "A", get_x = || x
+class B(x) extends A(x), name = || "B"
+class C(x) extends B(x), name = || "C", get_c = || "C_val"
+
+c = C(99)
+println("C name: " + c["name"]())
+println("C get_x: " + str(c["get_x"]()))
+println("C get_c: " + c["get_c"]())
+
+# 7. Test tuple map key retrieval
+m = { (1, 2): "found!" }
+println("Tuple key lookup: " + m[(1, 2)])

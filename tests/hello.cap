@@ -1,0 +1,33 @@
+# hello.cap — Phase 1 smoke test
+# Run: cap hello.cap
+
+println("Hello, world!")
+
+# Variables and arithmetic
+x = 10
+y = 3
+println("x + y =", x + y)
+println("x ** y =", x ** y)
+println("x / y =", x / y)
+
+# String interpolation
+name = "flux"
+println("Welcome to {name}!")
+
+# Lambda functions
+double = |x| x * 2
+square = |x| x * x
+add    = |a, b| a + b
+
+println("double(7) =", double(7))
+println("square(5) =", square(5))
+println("add(3, 4) =", add(3, 4))
+
+# Inline if/else
+abs_val = |x| if x >= 0 then x else -x
+println("abs(-9) =", abs_val(-9))
+println("abs(4)  =", abs_val(4))
+
+# Nested lambdas / higher-order
+apply = |f, x| f(x)
+println("apply(double, 6) =", apply(double, 6))

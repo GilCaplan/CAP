@@ -1,0 +1,16 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+# Basic recursion
+fib = |n| if n <= 1 then n else fib(n-1) + fib(n-2)
+assert(fib(5) == 5, "fib 5")
+assert(fib(6) == 8, "fib 6")
+
+# Deep recursion
+# Let's test deep recursion to see if there's a stack overflow
+# We won't assert exact values just whether it crashes
+deep = |n| if n == 0 then 0 else deep(n-1)
+# deep(1000) might overflow standard Rust stack, let's keep it moderate to see if it works
+res = deep(100)
+assert(res == 0, "moderate recursion")
+
+println("recursion test completed.")

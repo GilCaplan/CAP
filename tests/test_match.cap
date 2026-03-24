@@ -1,0 +1,28 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+status = 404
+msg = match status, 200 -> "ok", 404 -> "not found", _ -> "error"
+assert(msg == "not found", "basic match")
+
+# Multi-line match
+code = 1
+res = (match code,
+  0 -> "success",
+  1 -> "warning",
+  _ -> "failure"
+)
+assert(res == "warning", "multi-line match")
+
+# Match on string
+s = "b"
+s_res = match s, "a" -> 1, "b" -> 2, _ -> 3
+assert(s_res == 2, "string match")
+
+# Match on bool
+b = true
+b_res = match b, true -> "T", false -> "F"
+assert(b_res == "T", "bool match")
+
+
+
+println("match test completed.")

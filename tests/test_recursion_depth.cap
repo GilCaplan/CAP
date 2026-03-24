@@ -1,0 +1,5 @@
+# tests/test_recursion_depth.cap
+# Test deep recursion beyond the current 100 limit
+deep = |n| if n == 0 then 0 else deep(n-1)
+res = deep(300)  # Expect no crash, but may hit stack limit
+println("Recursion 300 successful: " + str(res == 0))

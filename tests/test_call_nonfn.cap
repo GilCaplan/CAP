@@ -1,0 +1,4 @@
+# tests/test_call_nonfn.cap — calling a non-function should give TypeError
+x = 42
+r = try(|| x())
+println(r["ok"])     # false

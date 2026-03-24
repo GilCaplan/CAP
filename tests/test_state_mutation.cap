@@ -1,0 +1,14 @@
+# tests/test_state_mutation.cap
+# Cap closures capture by snapshot. For mutable state use a list as a cell (ref type).
+make_counter = |start| do
+  count = [start]
+  || do
+    set(count, 0, count[0] + 1)
+    count[0]
+  end
+end
+
+c = make_counter(0)
+println(c())   # 1
+println(c())   # 2
+println(c())   # 3

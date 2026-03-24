@@ -1,0 +1,85 @@
+# tests/test_doc_data.cap
+
+assert_true = |name, val| if not bool(val) then error("Assertion failed: {name}") else println("  PASS: {name}")
+
+println("==== Testing CSV ====")
+
+csv_data = "name,age,score\nAlice,30,95.5\nBob,25,80.0"
+fs_write("test_data.csv", csv_data)
+
+rows = csv_read("test_data.csv")
+assert_true("csv_read len", rows.len == 2)
+assert_true("csv_read content", rows[0].name == "Alice" and rows[0].age == 30 and rows[0].score > 95.0)
+
+tsv_data = "x\ty\n10\t20"
+fs_write("test_data.tsv", tsv_data)
+rows_tsv = csv_read("test_data.tsv", "\t")
+assert_true("csv_read TSV", rows_tsv[0].x == 10)
+
+raw = csv_read_raw("test_data.csv")
+assert_true("csv_read_raw", raw[0][0] == "name" and raw[1][1] == 30)
+
+csv_write("test_out.csv", rows)
+assert_true("csv_write", fs_exists("test_out.csv"))
+
+parsed = csv_parse("a,b\n1,2\n3,4")
+assert_true("csv_parse", parsed[1].a == 3)
+
+parsed_tsv = csv_parse("a\tb\n1\t2", "\t")
+assert_true("csv_parse TSV", parsed_tsv[0].b == 2)
+
+println("\n==== Testing DataFrame (df_*) ====")
+
+df = df_read("test_data.csv")
+assert_true("df_read", df.len == 2)
+
+shape = df_shape(df)
+assert_true("df_shape", shape.rows == 2 and shape.cols == 3)
+
+cols = df_columns(df)
+assert_true("df_columns", any(cols, |c| c == "name"))
+
+desc = df_describe(df)
+assert_true("df_describe", any(keys(desc), |k| k == "age"))
+
+# Test df_select
+sub_df = df_select(df, ["name", "score"])
+assert_true("df_select", df_columns(sub_df).len == 2 and df_columns(sub_df)[1] == "score")
+
+# Test df_drop
+drop_df = df_drop(df, ["age"])
+assert_true("df_drop", df_columns(drop_df).len == 2 and not any(df_columns(drop_df), |c| c == "age"))
+
+# Test df_filter
+filtered = df_filter(df, "age > 26")
+assert_true("df_filter", filtered.len == 1 and filtered[0].name == "Alice")
+
+# Test df_sort
+sorted = df_sort(df, "age")
+assert_true("df_sort asc", sorted[0].name == "Bob")
+sorted_desc = df_sort(df, "age", true)
+assert_true("df_sort desc", sorted_desc[0].name == "Alice")
+
+# Test df_groupby
+grouped = df_groupby(df, "name", "sum")
+assert_true("df_groupby", grouped.len == 2)
+
+# Test df_join
+df2 = csv_parse("name,city\nAlice,NYC\nBob,LA")
+joined = df_join(df, df2, "name")
+assert_true("df_join", joined[0].city == "NYC" or joined[1].city == "NYC")
+
+# Test df_rename
+renamed = df_rename(df, {"name": "first_name"})
+assert_true("df_rename", any(df_columns(renamed), |x| x == "first_name"))
+
+# Test df_apply
+# Pandas lambda syntax requires proper python representation
+applied = df_apply(df, "age", "lambda x: x * 2")
+assert_true("df_apply", applied[0].age == 60)
+
+fs_delete("test_data.csv")
+fs_delete("test_data.tsv")
+fs_delete("test_out.csv")
+
+println("\nAll CSV / DataFrame tests passed!")

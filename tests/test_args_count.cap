@@ -1,0 +1,9 @@
+# tests/test_args_count.cap — verifies arity checking (BUG-10 fixed)
+add = |a, b| a + b
+
+# Too few args -> ArgumentError
+r = try(|| add(1))
+println(r["ok"])     # false
+
+# Correct call works
+println(add(3, 4))   # 7

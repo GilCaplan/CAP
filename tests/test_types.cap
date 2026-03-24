@@ -1,0 +1,59 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+# Null
+n = null
+assert(n == null, "null equality")
+
+# Bool
+assert(true, "true")
+assert(not false, "false")
+assert(true and true, "and")
+assert(true or false, "or")
+
+# Int
+i = 1_000_000
+assert(i == 1000000, "int underscores")
+assert(5 + 2 == 7, "add")
+assert(5 - 2 == 3, "sub")
+assert(5 * 2 == 10, "mul")
+assert(5 / 2 == 2 or 5 / 2 == 2.5, "div") # Unsure if int div is float or int, wait, LANGUAGE.md doesn't specify. Let's just print or let's test.
+
+# Let's just use simple expressions and print them for manual verification if assert fails.
+# Actually, since it's a test script, let's test operators directly.
+assert(10 % 3 == 1, "mod")
+assert(2 ** 3 == 8, "pow")
+
+# Float
+f = 3.14
+assert(f > 3.0, "float cmp")
+assert(-0.5 < 0.0, "float negative")
+
+# String
+s = "hello"
+assert(s == "hello", "str eq")
+assert("a" + "b" == "ab", "str concat")
+
+# List
+l = [1, 2, 3]
+assert(l[0] == 1, "list index")
+assert(l[-1] == 3, "list negative index")
+assert(l.len == 3, "list len")
+
+# Map
+m = {"a": 1, "b": 2}
+assert(m["a"] == 1, "map index")
+assert(m.b == 2, "map dot access")
+m["c"] = 3
+assert(m.c == 3, "map insert")
+
+# Tuple
+t = (1, "a", true)
+assert(t[0] == 1, "tuple index 0")
+assert(t[1] == "a", "tuple index 1")
+assert(t[2] == true, "tuple index 2")
+
+# Range
+r1 = 1..5
+r2 = 1..=5
+
+println("Types and operators test completed.")

@@ -1,0 +1,26 @@
+# tests/test_json_stringify.cap
+stringify = |val| (
+  (|t|
+    match t,
+      "null" -> "null",
+      "bool" -> if val then "true" else "false",
+      "int" -> str(val),
+      "float" -> str(val),
+      "str" -> "\"" + replace(replace(val, "\\", "\\\\"), "\"", "\\\"") + "\"",
+      "list" -> "[" + join(map(val, stringify), ", ") + "]",
+      "map" -> (
+         "{{" + join(map(keys(val), |k| "\"" + k + "\": " + stringify(val[k])), ", ") + "}}"
+      ),
+      _ -> "\"(function or unknown)\""
+  )(type(val))
+)
+
+data = {
+  "name": "Alice",
+  "age": 30,
+  "active": true,
+  "scores": [95, 88, 72.5],
+  "meta": null
+}
+
+println(stringify(data))

@@ -1,0 +1,12 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+# group vs tuple
+a = (1)
+assert(type(a) == "int", "(1) is int, not tuple")
+
+b = (1,)
+assert(type(b) == "tuple", "(1,) should be a tuple")
+assert(len(b) == 1, "single element tuple len")
+assert(b[0] == 1, "single element tuple value")
+
+println("single tuple test completed.")

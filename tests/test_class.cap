@@ -1,0 +1,31 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+class Point(x, y),
+  dist = || (x*x + y*y) ** 0.5,
+  add  = |other| Point(x + other["get_x"](), y + other["get_y"]()),
+  str  = || "({x}, {y})",
+  get_x = || x,
+  get_y = || y
+
+p1 = Point(3, 4)
+p2 = Point(1, 2)
+
+assert(p1["get_x"]() == 3, "getter")
+assert(p1["dist"]() == 5.0, "method")
+assert(p1["str"]() == "(3, 4)", "string formatting")
+
+sum_p = p1["add"](p2)
+assert(sum_p["get_x"]() == 4, "immutability and new object")
+
+# Check multi-line method bodies using parens
+class Shape(w, h),
+  area    = || w * h,
+  summary = || (
+    "area=" + str(w * h)
+  )
+
+s = Shape(2, 5)
+assert(s["area"]() == 10, "basic method shape")
+assert(s["summary"]() == "area=10", "multi-line method")
+
+println("OOP class test completed.")

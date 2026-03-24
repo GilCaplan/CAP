@@ -1,0 +1,57 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+l = [1, 2, 3, 4, 5]
+
+m = map(l, |x| x * 2)
+assert(m[0] == 2 and m[-1] == 10, "map")
+
+f = filter(l, |x| x > 3)
+assert(f.len == 2 and f[0] == 4, "filter")
+
+r = reduce(l, |a, b| a + b)
+assert(r == 15, "reduce no init")
+
+r2 = reduce(l, |a, b| a + b, 10)
+assert(r2 == 25, "reduce init")
+
+# sort and sort_by
+u = [3, 1, 4, 2]
+s = sort(u)
+assert(s[0] == 1 and s[-1] == 4, "sort")
+
+sb = sort_by(u, |x| -x)
+assert(sb[0] == 4 and sb[-1] == 1, "sort_by")
+
+rev = reverse(u)
+assert(rev[0] == 2 and rev[-1] == 3, "reverse")
+
+z = zip([1, 2], ["a", "b"])
+assert(z[0][0] == 1 and z[0][1] == "a", "zip")
+
+fl = flatten([[1, 2], [3, 4]])
+assert(fl.len == 4 and fl[0] == 1 and fl[-1] == 4, "flatten")
+
+assert(first(l) == 1, "first")
+assert(last(l) == 5, "last")
+assert(find(l, |x| x == 3) == 3, "find")
+assert(find(l, |x| x == 10) == null, "find null")
+assert(any(l, |x| x > 4) == true, "any true")
+assert(any(l, |x| x > 5) == false, "any false")
+assert(all(l, |x| x > 0) == true, "all true")
+
+e = enumerate(["a", "b"])
+assert(e[0][0] == 0 and e[0][1] == "a", "enumerate 0")
+assert(e[1][0] == 1 and e[1][1] == "b", "enumerate 1")
+
+# mutability
+m_list = [1, 2]
+append(m_list, 3)
+assert(m_list.len == 3 and m_list[-1] == 3, "append")
+extend(m_list, [4, 5])
+assert(m_list.len == 5 and m_list[-1] == 5, "extend")
+
+assert(sum(l) == 15, "sum")
+assert(min(l) == 1, "min")
+assert(max(l) == 5, "max")
+
+println("stdlib list test completed.")

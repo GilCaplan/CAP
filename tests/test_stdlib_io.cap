@@ -1,0 +1,28 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+# File I/O
+f = "tests/temp_test_io.txt"
+
+# write
+write(f, "hello\n")
+assert(exists(f), "exists true after write")
+
+# read
+content = read(f)
+assert(content == "hello\n", "read content")
+
+# file_append (renamed from append to avoid collision with list append)
+file_append(f, "world\n")
+content2 = read(f)
+assert(content2 == "hello\nworld\n", "file_append content")
+
+
+# ls
+files = ls("tests")
+# Can't assert exact content since files differ, but it should be a list with len > 0
+assert(type(files) == "list", "ls type")
+assert(files.len > 0, "ls len")
+
+# Note: not testing `input` directly as it blocks test execution waiting for IO
+
+println("stdlib io test completed.")

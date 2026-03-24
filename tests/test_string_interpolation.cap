@@ -1,0 +1,25 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+name = "world"
+assert("Hello, {name}!" == "Hello, world!", "basic interpolation")
+
+x = 42
+assert("x is {x}" == "x is 42", "int interpolation")
+
+assert("math: {10 + 5}" == "math: 15", "expr interpolation")
+assert("quote: {\"inner\"}" == "quote: inner", "string in interpolation")
+
+escaped = "escaped {{name}}"
+assert(escaped.len == 14, "escaped braces")
+
+func = || "result"
+assert("call: {func()}" == "call: result", "function call interpolation")
+
+assert("list: {[1, 2]}" == "list: [1, 2]", "list interpolation")
+
+# Map with braces inside interpolation brace
+# This might be tricky for a token-efficient parser
+m = {"a": 1}
+assert("map: {m}" == "map: {{a: 1}}", "map interpolation format")
+
+println("String interpolation test completed.")

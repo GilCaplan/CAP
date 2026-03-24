@@ -1,0 +1,25 @@
+# tests/test_doc_server.cap
+
+assert_true = |name, val| if not bool(val) then error("Assertion failed: {name}") else println("  PASS: {name}")
+
+println("==== Testing HTTP Server ====")
+
+# Testing background Flask server
+info = server_start(8080, {
+  "GET /test": "Hello from Cap Server",
+  "POST /data": {"status": "received"}
+})
+assert_true("server_start", type(info) == "map" and info.port == 8080)
+
+# Make requests using net module
+res_get = http_get("http://localhost:8080/test")
+assert_true("http_get(server)", res_get.status == 200 and res_get.body == "Hello from Cap Server")
+
+res_post = http_post("http://localhost:8080/data", {"Content-Type": "application/json"}, {"param":"val"})
+assert_true("http_post(server)", res_post.status == 200 and contains(res_post.body, "received"))
+
+# Stop server
+server_stop()
+assert_true("server_stop", true)
+
+println("\nAll Server tests passed!")

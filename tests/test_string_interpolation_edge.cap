@@ -1,0 +1,9 @@
+# tests/test_string_interpolation_edge.cap
+# Interpolation with escaped braces and complex expressions
+s = "{{" + "inner" + "}}"
+println("Escaped braces: " + s)
+
+# Interpolation with nested expressions
+# NOTE: Currently { } interpolation drops trailing string if unescaped
+msg = "Result: { (|x| x*2)(3) }"
+println(msg)

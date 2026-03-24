@@ -1,0 +1,17 @@
+# tests/test_coercion.cap
+# Boolean truthiness
+println("bool(null): " + str(bool(null)))   # false
+println("bool(0): " + str(bool(0)))         # false
+println("bool(''): " + str(bool("")))       # false
+println("bool([]): " + str(bool([])))       # false
+
+# cap does NOT do implicit type coercion -- use explicit conversion
+println("str(1) + '2' = " + (str(1) + "2"))   # 12
+
+# Array concat
+arr = [1] + [2]
+println("arr concat: " + str(arr))   # [1, 2]
+
+# int + str is a TypeError (no implicit coercion)
+r = try(|| 1 + "2")
+println("1 + '2' error: " + str(not r["ok"]))   # true

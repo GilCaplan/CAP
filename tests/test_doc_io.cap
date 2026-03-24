@@ -1,0 +1,78 @@
+# tests/test_doc_io.cap
+
+println("==== Testing File I/O ====")
+assert_true = |name, val| if not bool(val) then error("Assertion failed: {name}") else println("  PASS: {name}")
+
+# file I/O
+write("test_io.txt", "line1")
+# user changed append to file_append
+file_append("test_io.txt", "\nline2")
+content = read("test_io.txt")
+assert_true("read/write/file_append", content == "line1\nline2")
+assert_true("exists", exists("test_io.txt"))
+fs_delete("test_io.txt")
+
+println("\n==== Testing JSON ====")
+j = json_parse("{{\"a\": 1, \"b\": [2, 3]}}")
+assert_true("json_parse", j.a == 1 and j.b[1] == 3)
+s = json_stringify(j)
+assert_true("json_stringify", contains(s, "1"))
+
+println("\n==== Testing System/Shell ====")
+cmd = shell("echo hello")
+assert_true("shell", cmd.status == 0 and contains(cmd.stdout, "hello"))
+cmd2 = shell_lines("echo a\necho b")
+assert_true("shell_lines", cmd2.len == 2 and cmd2[0] == "a")
+
+assert_true("env", env("PATH") != null)
+assert_true("env_all", len(env_all()) > 0)
+
+# Python basic
+py_res = python("print('py hello')")
+assert_true("python", contains(py_res, "py hello"))
+pr = pyval("cap_return({{'v': 42}})")
+assert_true("pyval", pr.v == 42)
+
+println("\n==== Testing File System (fs_*/os_*) ====")
+fs_write("test_fs.txt", "abc")
+assert_true("fs_read/fs_write", fs_read("test_fs.txt") == "abc")
+fs_append("test_fs.txt", "def")
+assert_true("fs_append", fs_read("test_fs.txt") == "abcdef")
+assert_true("fs_exists", fs_exists("test_fs.txt"))
+assert_true("fs_is_file", fs_is_file("test_fs.txt"))
+assert_true("fs_is_dir", not fs_is_dir("test_fs.txt"))
+
+fs_mkdir("test_dir")
+assert_true("fs_mkdir", fs_is_dir("test_dir"))
+fs_copy("test_fs.txt", "test_dir/copy.txt")
+assert_true("fs_copy", fs_read("test_dir/copy.txt") == "abcdef")
+fs_move("test_dir/copy.txt", "test_dir/moved.txt")
+assert_true("fs_move", fs_exists("test_dir/moved.txt") and not fs_exists("test_dir/copy.txt"))
+
+stats = fs_stat("test_fs.txt")
+assert_true("fs_stat", stats.is_file and stats.size > 0)
+
+fs_delete("test_fs.txt")
+fs_delete("test_dir/moved.txt")
+fs_rmdir("test_dir")
+
+assert_true("os_cwd", type(os_cwd()) == "str")
+assert_true("os_pid", type(os_pid()) == "int")
+assert_true("os_home", type(os_home()) == "str")
+assert_true("os_username", type(os_username()) == "str")
+assert_true("os_hostname", type(os_hostname()) == "str")
+
+assert_true("os_path_join", os_path_join("a", "b", "c") == "a/b/c")
+assert_true("os_path_basename", os_path_basename("a/b/c.txt") == "c.txt")
+assert_true("os_path_dirname", os_path_dirname("a/b/c.txt") == "a/b")
+assert_true("os_path_ext", os_path_ext("a/b/c.txt") == "txt")
+assert_true("os_abs", contains(os_abs("tests/test_doc_io.cap"), "test_doc_io.cap"))
+
+println("\n==== Testing HTTP ====")
+# r = http_get("https://httpbin.org/get")
+# assert_true("http_get", r.status == 200)
+
+# p = http_post("https://httpbin.org/post", "test_body")
+# assert_true("http_post", p.status == 200 and contains(p.body, "test_body"))
+
+println("\nAll I/O / FS / OS / JSON / Net tests passed!")

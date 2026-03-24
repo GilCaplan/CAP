@@ -1,0 +1,9 @@
+# tests/test_brace_parsing.cap — literal braces require {{ and }}
+# {{ gives literal {, }} gives literal }
+
+s = "{{" + "xyz" + "}}"
+println(s)   # {xyz}
+
+# Interpolation still works normally
+name = "world"
+println("hello {name}")   # hello world

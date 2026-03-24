@@ -1,0 +1,66 @@
+# pipelines.cap — Phase 2 core features
+# Run: cap pipelines.cap
+
+# ── Basic pipeline ────────────────────────────────────────────────────────────
+double = |x| x * 2
+is_big = |x| x > 5
+
+result = [1, 2, 3, 4, 5] |> map(double) |> filter(is_big)
+println("doubled and filtered:", result)
+
+# ── Chained pipeline ──────────────────────────────────────────────────────────
+total = range(1, 11) |> filter(|n| n % 2 == 0) |> sum
+println("sum of even 1-10:", total)
+
+# ── tap for debugging a pipeline ──────────────────────────────────────────────
+result2 = [3, 1, 4, 1, 5, 9] |> tap(|xs| println("before sort:", xs)) |> sort
+println("after sort:", result2)
+
+# ── String pipeline ───────────────────────────────────────────────────────────
+csv = "alice,bob,charlie,dave"
+names = split(csv, ",") |> map(upper) |> sort
+println("names:", names)
+
+# ── Match expression ──────────────────────────────────────────────────────────
+grade = |score| match score,
+  100 -> "perfect",
+  _ -> if score >= 90 then "A" elif score >= 80 then "B" elif score >= 70 then "C" else "F"
+
+println("grade(100):", grade(100))
+println("grade(85):", grade(85))
+println("grade(72):", grade(72))
+println("grade(50):", grade(50))
+
+# ── Null coalescing ───────────────────────────────────────────────────────────
+config = {"host": "localhost"}
+port = config["port"] ?? 8080
+println("port:", port)
+
+# ── Enumerate + format ────────────────────────────────────────────────────────
+fruits = ["apple", "banana", "cherry"]
+labeled = enumerate(fruits) |> map(|pair| "{pair[0]}: {pair[1]}")
+labeled |> each(println)
+
+# ── Reduce ────────────────────────────────────────────────────────────────────
+words  = ["the", "quick", "brown", "fox"]
+sentence = reduce(words, |acc, w| "{acc} {w}")
+println("sentence:", sentence)
+
+# ── Ranges ────────────────────────────────────────────────────────────────────
+squares = (1..6) |> map(|n| n * n)
+println("squares 1-5:", squares)
+
+# ── Nested data ───────────────────────────────────────────────────────────────
+users = [
+  {"name": "Alice", "age": 30, "active": true},
+  {"name": "Bob",   "age": 25, "active": false},
+  {"name": "Carol", "age": 35, "active": true}
+]
+
+active_names = (
+  users
+  |> filter(|u| u["active"])
+  |> map(|u| u["name"])
+  |> sort
+)
+println("active users:", active_names)

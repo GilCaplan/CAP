@@ -1,0 +1,55 @@
+# tests/test_game_life.cap
+# Conway's Game of Life in Cap
+w = 10
+h = 10
+
+# Initialize an empty grid (flat array for simplicity)
+grid = 0..(w * h) |> map(|i| 0)
+# Add a glider
+set(grid, 1, 1)
+set(grid, w + 2, 1)
+set(grid, 2*w + 0, 1)
+set(grid, 2*w + 1, 1)
+set(grid, 2*w + 2, 1)
+
+get_cell = |g, x, y| do
+  if x < 0 or x >= w or y < 0 or y >= h then 0 else g[y * w + x]
+end
+
+count_neighbors = |g, x, y| (
+  get_cell(g, x-1, y-1) + get_cell(g, x, y-1) + get_cell(g, x+1, y-1) +
+  get_cell(g, x-1, y)   +                       get_cell(g, x+1, y)   +
+  get_cell(g, x-1, y+1) + get_cell(g, x, y+1) + get_cell(g, x+1, y+1)
+)
+
+step = |g| do
+  0..(w * h) |> map(|i| do
+    y = int(i / w)
+    x = i % w
+    n = count_neighbors(g, x, y)
+    cell = get_cell(g, x, y)
+    if cell == 1 and (n == 2 or n == 3) then 1
+    elif cell == 0 and n == 3 then 1
+    else 0
+  end)
+end
+
+print_grid = |g| do
+  # build rows
+  0..h |> each(|y| do
+    row = 0..w |> map(|x| if get_cell(g, x, y) == 1 then "#" else ".") |> join("")
+    println(row)
+  end)
+  println("")
+end
+
+println("Generation 0:")
+print_grid(grid)
+
+grid1 = step(grid)
+println("Generation 1:")
+print_grid(grid1)
+
+grid2 = step(grid1)
+println("Generation 2:")
+print_grid(grid2)

@@ -1,0 +1,50 @@
+# tests/test_aoc_2.cap
+# Advent of Code 2015 - Day 2: I Was Told There Would Be No Math
+# Calculate wrapping paper: 2*l*w + 2*w*h + 2*h*l + area of smallest side
+# Calculate ribbon: shortest perimeter + l*w*h volume
+
+assert_true = |name, val| if not bool(val) then error("Assertion failed: {name}") else println("  PASS: {name}")
+
+input_data = [
+    "2x3x4",
+    "1x1x10"
+]
+
+total_paper = 0
+total_ribbon = 0
+
+for line in input_data do
+    parts = split(line, "x")
+    l = int(parts[0])
+    w = int(parts[1])
+    h = int(parts[2])
+    
+    side_1 = l * w
+    side_2 = w * h
+    side_3 = h * l
+    
+    # Paper:
+    areas = [side_1, side_2, side_3]
+    areas = sort(areas)
+    smallest_area = areas[0]
+    
+    paper = 2*side_1 + 2*side_2 + 2*side_3 + smallest_area
+    total_paper = total_paper + paper
+    
+    # Ribbon:
+    dims = [l, w, h]
+    dims = sort(dims)
+    shortest_perim = 2 * dims[0] + 2 * dims[1]
+    volume = l * w * h
+    
+    ribbon = shortest_perim + volume
+    total_ribbon = total_ribbon + ribbon
+end
+
+println("Total Paper Required: ", total_paper)
+println("Total Ribbon Required: ", total_ribbon)
+
+assert_true("Paper test 1 (58) + test 2 (43) == 101", total_paper == 101)
+assert_true("Ribbon test 1 (34) + test 2 (14) == 48", total_ribbon == 48)
+
+println("\nAoC 2015 Day 2 passed!")

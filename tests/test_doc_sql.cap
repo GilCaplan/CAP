@@ -1,0 +1,28 @@
+# tests/test_doc_sql.cap
+
+assert_true = |name, val| if not bool(val) then error("Assertion failed: {name}") else println("  PASS: {name}")
+
+println("==== Testing SQLite (sql_*) ====")
+
+db_path = "test_db.sqlite"
+if fs_exists(db_path) then fs_delete(db_path) else null
+
+sql_open(db_path)
+assert_true("sql_open", true)
+
+res_exec = sql_exec("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)")
+assert_true("sql_exec (create)", res_exec.rows_affected == 0)
+
+sql_exec("INSERT INTO users (name, age) VALUES ('Alice', 30)")
+sql_exec("INSERT INTO users (name, age) VALUES ('Bob', 25)")
+assert_true("sql_exec (insert)", true)
+
+res_query = sql_query("SELECT * FROM users ORDER BY age DESC")
+assert_true("sql_query", res_query.len == 2)
+assert_true("sql_query (data)", res_query[0].name == "Alice" and res_query[1].age == 25)
+
+sql_close()
+assert_true("sql_close", true)
+
+if fs_exists(db_path) then fs_delete(db_path) else null
+println("\nAll SQLite tests passed!")

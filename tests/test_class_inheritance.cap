@@ -1,0 +1,27 @@
+# tests/test_class_inheritance.cap — BUG-14 fixed: extends keyword
+
+# Base class
+class Base(x),
+  get = || x
+
+# Derived adds a method; get() is not auto-injected into scope,
+# so double accesses x directly (it's in the closure).
+class Derived(y) extends Base(y),
+  double = || y * 2
+
+obj = Derived(5)
+println("Base getter: " + str(obj["get"]()))   # 5
+println("Derived double: " + str(obj["double"]()))   # 10
+
+# Inherited method still works
+println("Inherited get: " + str(obj["get"]()))   # 5
+
+# Method override — child overrides parent
+class Animal(name),
+  speak = || "..."
+
+class Dog(name) extends Animal(name),
+  speak = || "Woof"
+
+d = Dog("Rex")
+println(d["speak"]())   # Woof

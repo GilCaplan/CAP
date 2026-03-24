@@ -1,0 +1,17 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+println("testing edge cases...")
+
+# Empty list edge cases
+assert(first([]) == null, "first empty list")
+assert(last([]) == null, "last empty list")
+
+# Negative index edge cases
+# test out of bounds
+# According to typical array rules, out of bounds throws error. Let's just test simple valid ones
+l = [1]
+assert(l[-1] == 1, "negative index 1")
+
+
+
+println("edge cases test completed.")

@@ -1,0 +1,10 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+x = 10
+f = |x| x * 2
+assert(f(5) == 10, "shadowing parameter")
+assert(x == 10, "outer variable untouched")
+
+
+
+println("shadowing test completed.")

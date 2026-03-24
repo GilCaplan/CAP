@@ -1,0 +1,17 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+r1 = 1..5
+assert(r1.len == 4, "exclusive range len")
+assert(r1[0] == 1, "exclusive range start")
+assert(r1[-1] == 4, "exclusive range end")
+
+r2 = 1..=5
+assert(r2.len == 5, "inclusive range len")
+assert(r2[-1] == 5, "inclusive range end")
+
+# Do they work with negative numbers?
+r3 = -2..2
+assert(r3.len == 4, "negative range len")
+assert(r3[0] == -2, "negative range start")
+
+println("ranges test completed.")

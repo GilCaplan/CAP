@@ -1,0 +1,9 @@
+# debug_df.cap
+csv_data = "name,age,score\nAlice,30,95.5\nBob,25,80.0"
+fs_write("test_data.csv", csv_data)
+df = df_read("test_data.csv")
+cols = df_columns(df)
+println("COLS TYPE: {type(cols)}")
+println("COLS REPR: {repr(cols)}")
+println("COLS[0]: {cols[0]}")
+fs_delete("test_data.csv")

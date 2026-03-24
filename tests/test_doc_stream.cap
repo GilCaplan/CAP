@@ -1,0 +1,45 @@
+# tests/test_doc_stream.cap
+
+assert_true = |name, val| if not bool(val) then error("Assertion failed: {name}") else println("  PASS: {name}")
+
+println("==== Testing Streams & Gzip ====")
+
+fs_path = "test_stream.txt"
+gz_path = "test_stream.txt.gz"
+
+if fs_exists(fs_path) then fs_delete(fs_path) else null
+if fs_exists(gz_path) then fs_delete(gz_path) else null
+
+# Vanilla Streams
+stream_write(fs_path, "line1\nline2\nline3")
+assert_true("stream_write", fs_exists(fs_path))
+
+lines = stream_lines(fs_path)
+assert_true("stream_lines", lines.len == 3 and lines[0] == "line1")
+
+stream_append(fs_path, "\nline4")
+lines4 = stream_lines(fs_path)
+assert_true("stream_append", lines4.len == 4 and lines4[3] == "line4")
+
+bytes = stream_bytes(fs_path)
+assert_true("stream_bytes", bytes.len > 0)
+
+# Gzip write/read
+gz_write(gz_path, "hello gzip\nworld")
+assert_true("gz_write", fs_exists(gz_path))
+
+gz_txt = gz_read(gz_path)
+assert_true("gz_read", gz_txt == "hello gzip\nworld")
+
+# Compress / Decompress in-memory
+b64 = gz_compress("magic string")
+assert_true("gz_compress", type(b64) == "str")
+
+dec = gz_decompress(b64)
+assert_true("gz_decompress", dec == "magic string")
+
+# Cleanup
+if fs_exists(fs_path) then fs_delete(fs_path) else null
+if fs_exists(gz_path) then fs_delete(gz_path) else null
+
+println("\nAll Stream/Gzip tests passed!")

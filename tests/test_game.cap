@@ -1,0 +1,46 @@
+# tests/test_game.cap
+# Tic-Tac-Toe
+println("Starting Game...")
+
+make_board = || [" ", " ", " ", " ", " ", " ", " ", " ", " "]
+
+print_board = |b| [
+  println("{b[0]} | {b[1]} | {b[2]}"),
+  println("---------"),
+  println("{b[3]} | {b[4]} | {b[5]}"),
+  println("---------"),
+  println("{b[6]} | {b[7]} | {b[8]}")
+]
+
+check_winner = |b, p| (
+  (b[0] == p and b[1] == p and b[2] == p) or
+  (b[3] == p and b[4] == p and b[5] == p) or
+  (b[6] == p and b[7] == p and b[8] == p) or
+  (b[0] == p and b[3] == p and b[6] == p) or
+  (b[1] == p and b[4] == p and b[7] == p) or
+  (b[2] == p and b[5] == p and b[8] == p) or
+  (b[0] == p and b[4] == p and b[8] == p) or
+  (b[2] == p and b[4] == p and b[6] == p)
+)
+
+turn_next = |turn| if turn == "X" then "O" else "X"
+
+play_after_move = |board, turn, max_turns, play_fn| if check_winner(board, turn) then (
+  (|_p| println("Player {turn} wins!"))(print_board(board))
+) else (
+  play_fn(board, turn_next(turn), max_turns - 1)
+)
+
+set_board = |b, p, v| enumerate(b) |> map(|t| if t[0] == p then v else t[1])
+
+play_turn = |board, turn, max_turns, play_fn| play_after_move(set_board(board, max_turns - 1, turn), turn, max_turns, play_fn)
+
+play = |board, turn, max_turns| (
+  (|_p| 
+    if max_turns == 0 then println("Draw!") else play_turn(board, turn, max_turns, play)
+  )(print_board(board))
+)
+
+b = make_board()
+play(b, "X", 9)
+println("Game tests complete")

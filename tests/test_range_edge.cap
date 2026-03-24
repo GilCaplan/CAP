@@ -1,0 +1,11 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+# backwards range
+r1 = 10..5
+assert(r1.len == 0, "backwards range is empty")
+
+# range step 0 should error
+r2 = try(|| range(1, 10, 0))
+assert(not r2["ok"], "zero step range should error")
+
+println("range edge test completed.")

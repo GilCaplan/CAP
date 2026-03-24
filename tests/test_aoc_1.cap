@@ -1,0 +1,25 @@
+# tests/test_aoc_1.cap
+# Advent of Code 2015 - Day 1: Not Quite Lisp
+# An elevator follows instructions where `(` means go up 1 floor, `)` means go down 1 floor.
+# Find the floor Santa ends up on, and the position of the character that causes him to enter the basement (-1).
+
+assert_true = |name, val| if not bool(val) then error("Assertion failed: {name}") else println("  PASS: {name}")
+
+input_data = "(()(()(((((())())())(()())(()((()()()()()()()()())(((())(((()))))(("
+
+floor = 0
+basement_pos = -1
+
+for i in range(0, input_data.len) do
+    char = input_data[i]
+    floor = if char == "(" then floor + 1 else if char == ")" then floor - 1 else floor
+    basement_pos = if floor == -1 and basement_pos == -1 then (i + 1) else basement_pos
+end
+
+println("Final Floor: ", floor)
+println("Basement Position: ", basement_pos)
+
+assert_true("AoC Day 1 Final Floor Calculation", floor == 9)
+assert_true("AoC Day 1 Basement Position", basement_pos == -1)
+
+println("\nAoC 2015 Day 1 passed!")

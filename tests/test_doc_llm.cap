@@ -1,0 +1,33 @@
+# tests/test_doc_llm.cap
+
+assert_true = |name, val| if not bool(val) then error("Assertion failed: {name}") else println("  PASS: {name}")
+
+println("==== Testing LLM Integrations ====")
+
+sys_msg = llm_system("You are a helpful assistant")
+assert_true("llm_system", type(sys_msg) == "map" and sys_msg.role == "system")
+
+usr_msg = llm_user("Hello")
+assert_true("llm_user", type(usr_msg) == "map" and usr_msg.content == "Hello")
+
+# Start a mock Ollama server in the background on port 11435 to avoid colliding with real server
+fake_responses = {
+  "GET /api/tags": {"models": [{"name": "fake-llama3"}]},
+  "POST /api/chat": {"model": "fake-llama3", "message": {"role": "assistant", "content": "Mocked LLM reply!"}, "eval_count": 42}
+}
+info = server_start(11435, fake_responses)
+assert_true("mock_ollama_started", type(info) == "map" and info.port == 11435)
+
+# Test Ollama list
+models = ollama_list({"host": "http://localhost:11435"})
+assert_true("ollama_list", type(models) == "list" and models.len == 1 and models[0] == "fake-llama3")
+
+# Test Ollama chat
+chat_opts = {"host": "http://localhost:11435", "temperature": 0.0}
+reply = ollama_chat("fake-llama3", [sys_msg, usr_msg], chat_opts)
+assert_true("ollama_chat", reply.content == "Mocked LLM reply!" and reply.tokens == 42)
+
+server_stop()
+assert_true("server_stop", true)
+
+println("\nAll LLM tests passed!")

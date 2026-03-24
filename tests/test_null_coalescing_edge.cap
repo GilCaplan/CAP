@@ -1,0 +1,9 @@
+# tests/test_null_coalescing_edge.cap
+# Nested null‑coalescing with maps and lists
+m = {"a": null}
+val = m["a"] ?? {"b": 2}["b"] ?? 99
+println("Nested coalesce: " + str(val))  # Expected: Nested coalesce: 2
+
+# also try coalescing missing keys
+missing = m["b"] ?? 5
+println("Missing key coalesce: " + str(missing))

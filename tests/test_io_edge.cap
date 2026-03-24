@@ -1,0 +1,9 @@
+# tests/test_io_edge.cap
+println("Exists missing file: " + str(exists("non_existent_random_file.txt")))
+
+files = ls("tests")
+println("Listed tests dir, found files: " + str(files.len > 0))
+
+# Reading nonexistent file -- use try to catch IOError (BUG-13 fixed)
+r = try(|| read("hopefully_this_file_does_not_exist_in_the_universe.txt"))
+println("IOError caught: " + str(not r["ok"]))

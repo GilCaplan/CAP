@@ -1,0 +1,4 @@
+# test_type_error.cap -- type errors have correct messages (BUG-9 fixed)
+# null + 1 should report got "null and int"
+r = try(|| null + 1)
+println(r["ok"])   # false

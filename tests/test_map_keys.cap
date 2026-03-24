@@ -1,0 +1,12 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+m = {}
+m[1] = "one"
+assert(m[1] == "one", "int map key")
+
+m[true] = "true_val"
+assert(m[true] == "true_val", "bool map key")
+
+(m)
+
+println("map keys test completed.")

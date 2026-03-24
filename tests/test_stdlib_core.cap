@@ -1,0 +1,27 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+# conversions
+assert(str(42) == "42", "str")
+assert(int("42") == 42, "int")
+assert(float("3.14") == 3.14, "float")
+assert(bool(1) == true, "bool int")
+assert(bool(0) == false, "bool zero")
+assert(bool("") == false, "bool empty string")
+assert(bool("ok") == true, "bool string")
+
+# other
+assert(len([1,2,3]) == 3, "len list")
+assert(len("abc") == 3, "len str")
+assert(type(42) == "int", "type int")
+assert(type("s") == "str", "type str")
+assert(repr([1, 2]) == "[1, 2]", "repr list")
+
+m = {"a": 1, "b": 2}
+k = keys(m)
+assert(k.len == 2 and (k[0] == "a" or k[0] == "b"), "keys")
+v = values(m)
+assert(v.len == 2, "values")
+i = items(m)
+assert(i.len == 2, "items")
+
+println("stdlib core test completed.")

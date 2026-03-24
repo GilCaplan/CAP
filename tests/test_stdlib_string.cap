@@ -1,0 +1,48 @@
+assert = |cond, msg| if cond then null else error(msg)
+
+s = "  hello world  "
+
+assert(s.trim == "hello world", "trim method")
+assert(trim(s) == "hello world", "trim func")
+assert(trim_start(s) == "hello world  ", "trim_start")
+assert(trim_end(s) == "  hello world", "trim_end")
+
+assert(s.upper == "  HELLO WORLD  ", "upper method")
+assert(upper(s) == "  HELLO WORLD  ", "upper func")
+assert(s.lower == "  hello world  ", "lower method")
+assert(lower("AAA") == "aaa", "lower func")
+
+assert(s.len == 15, "len property")
+assert(len(s) == 15, "len func")
+
+# split and join
+sp = split("a,b,c", ",")
+assert(sp.len == 3 and sp[1] == "b", "split")
+j = join(sp, "-")
+assert(j == "a-b-c", "join")
+
+# lines
+l = "line1\nline2\nline3"
+ls = l.lines
+assert(ls.len == 3 and ls[1] == "line2", "lines property")
+assert(lines(l)[2] == "line3", "lines func")
+
+# chars
+c = "abc"
+cs = c.chars
+assert(cs.len == 3 and cs[0] == "a" and cs[1] == "b" and cs[2] == "c", "chars property")
+assert(chars(c)[0] == "a", "chars func")
+
+# replace
+assert(replace("hello", "l", "w") == "hewwo", "replace")
+# properties as methods
+assert("hello".replace("l", "w") == "hewwo", "replace method")
+
+assert(contains("hello", "ell") == true, "contains true")
+assert(contains("hello", "x") == false, "contains false")
+assert("hello".contains("ell"), "contains method")
+
+assert(starts_with("hello", "hel") == true, "starts_with")
+assert(ends_with("hello", "llo") == true, "ends_with")
+
+println("stdlib string test completed.")
