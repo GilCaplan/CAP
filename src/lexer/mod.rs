@@ -243,6 +243,7 @@ impl<'src> Lexer<'src> {
                         Some('"')  => { self.advance_char(); '"'  }
                         Some('\\') => { self.advance_char(); '\\' }
                         Some('{')  => { self.advance_char(); '{'  }
+                        Some('}')  => { self.advance_char(); '}'  }
                         Some(c)    => { current.push('\\'); c     }
                         None       => break,
                     };
@@ -263,11 +264,13 @@ impl<'src> Lexer<'src> {
     }
 
     // ── Triple-quoted string `"""..."""` ─────────────────────────────────────
-    // Raw: no interpolation, no escape sequences. Can span multiple lines.
-    // Terminates at first `"""`.
+    // Supports interpolation with {expr}, {{ and }} as literal brace escapes,
+    // and \{ / \} escape sequences. Can span multiple lines. Terminates at `"""`.
 
     fn lex_triple_string(&mut self, start: usize, start_col: u32) -> Result<Token, CapError> {
-        let mut s = String::new();
+        let mut parts: Vec<StrPart> = Vec::new();
+        let mut current = String::new();
+
         loop {
             match self.peek_char() {
                 None => {
@@ -284,17 +287,112 @@ impl<'src> Lexer<'src> {
                         self.advance_char(); // consume 3rd "
                         break;
                     }
-                    // Single or double quote — include as literal
-                    s.push('"');
+                    current.push('"');
                     self.advance_char();
                 }
+                Some('{') => {
+                    self.advance_char();
+                    if self.peek_char() == Some('{') {
+                        self.advance_char();
+                        current.push('{');
+                    } else {
+                        // Begin interpolation: scan until matching }
+                        if !current.is_empty() {
+                            parts.push(StrPart::Literal(std::mem::take(&mut current)));
+                        }
+                        let mut interp = String::new();
+                        let mut depth = 1u32;
+                        loop {
+                            match self.peek_char() {
+                                None => {
+                                    return Err(CapError::UnterminatedString {
+                                        span: self.span_at(start, start_col),
+                                    });
+                                }
+                                Some('{') => { depth += 1; interp.push('{'); self.advance_char(); }
+                                Some('}') => {
+                                    self.advance_char();
+                                    depth -= 1;
+                                    if depth == 0 { break; }
+                                    interp.push('}');
+                                }
+                                Some('"') => {
+                                    interp.push('"');
+                                    self.advance_char();
+                                    loop {
+                                        match self.peek_char() {
+                                            None => {
+                                                return Err(CapError::UnterminatedString {
+                                                    span: self.span_at(start, start_col),
+                                                });
+                                            }
+                                            Some('"') => {
+                                                interp.push('"');
+                                                self.advance_char();
+                                                break;
+                                            }
+                                            Some('\\') => {
+                                                self.advance_char();
+                                                match self.peek_char() {
+                                                    Some(c) => { interp.push(c); self.advance_char(); }
+                                                    None    => break,
+                                                }
+                                            }
+                                            Some(c) => { interp.push(c); self.advance_char(); }
+                                        }
+                                    }
+                                }
+                                Some('\\') => {
+                                    self.advance_char();
+                                    match self.peek_char() {
+                                        Some('"')  => { interp.push('"');  self.advance_char(); }
+                                        Some('\\') => { interp.push('\\'); self.advance_char(); }
+                                        Some(c)    => { interp.push('\\'); interp.push(c); self.advance_char(); }
+                                        None       => break,
+                                    }
+                                }
+                                Some(c) => { interp.push(c); self.advance_char(); }
+                            }
+                        }
+                        parts.push(StrPart::Interp(interp));
+                    }
+                }
+                Some('}') => {
+                    self.advance_char();
+                    if self.peek_char() == Some('}') {
+                        self.advance_char();
+                        current.push('}');
+                    } else {
+                        current.push('}');
+                    }
+                }
+                Some('\\') => {
+                    self.advance_char();
+                    let esc = match self.peek_char() {
+                        Some('n')  => { self.advance_char(); '\n' }
+                        Some('t')  => { self.advance_char(); '\t' }
+                        Some('r')  => { self.advance_char(); '\r' }
+                        Some('"')  => { self.advance_char(); '"'  }
+                        Some('\\') => { self.advance_char(); '\\' }
+                        Some('{')  => { self.advance_char(); '{'  }
+                        Some('}')  => { self.advance_char(); '}'  }
+                        Some(c)    => { current.push('\\'); c     }
+                        None       => break,
+                    };
+                    current.push(esc);
+                }
                 Some(c) => {
-                    s.push(c);
+                    // Newlines are allowed in triple-quoted strings
+                    current.push(c);
                     self.advance_char();
                 }
             }
         }
-        let parts = vec![StrPart::Literal(s)];
+
+        if !current.is_empty() || parts.is_empty() {
+            parts.push(StrPart::Literal(current));
+        }
+
         Ok(Token::new(TokenKind::Str(parts), self.span_at(start, start_col)))
     }
 

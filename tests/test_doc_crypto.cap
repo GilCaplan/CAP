@@ -38,7 +38,7 @@ println("\n==== Testing Regex ====")
 assert_true("regex_match", regex_match("^[0-9]+$", "123"))
 assert_true("regex_find", regex_find("[a-z]+", "123abc456") == "abc")
 assert_true("regex_find_all", regex_find_all("[a-z]", "a1b2c").len == 3)
-assert_true("regex_replace", regex_replace("[0-9]", "X", "a1b2") == "aXbX")
+assert_true("regex_replace", regex_replace("a1b2", "[0-9]", "X") == "aXbX")
 
 println("\n==== Testing Vectors (Native) ====")
 

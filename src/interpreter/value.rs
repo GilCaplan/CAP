@@ -169,7 +169,13 @@ impl Value {
                 format!("[{}]", items.join(", "))
             }
             Value::Map(m)      => {
-                let pairs: Vec<_> = m.borrow().iter().map(|(k, v)| format!("{k}: {}", v.repr())).collect();
+                let pairs: Vec<_> = m.borrow().iter().map(|(k, v)| {
+                    let key_str = match k {
+                        MapKey::Str(s) => format!("\"{}\"", s.replace('\\', "\\\\").replace('"', "\\\"")),
+                        other          => other.to_string(),
+                    };
+                    format!("{key_str}: {}", v.repr())
+                }).collect();
                 format!("{{{}}}", pairs.join(", "))
             }
             Value::Tuple(t)    => {

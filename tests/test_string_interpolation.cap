@@ -20,6 +20,6 @@ assert("list: {[1, 2]}" == "list: [1, 2]", "list interpolation")
 # Map with braces inside interpolation brace
 # This might be tricky for a token-efficient parser
 m = {"a": 1}
-assert("map: {m}" == "map: {{a: 1}}", "map interpolation format")
+assert("map: {m}" == "map: {{\"a\": 1}}", "map interpolation format")
 
 println("String interpolation test completed.")

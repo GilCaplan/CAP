@@ -97,14 +97,15 @@ pub fn call(name: &str, args: Vec<Value>, span: &Span) -> Result<Value, CapError
             Ok(Value::List(Rc::new(RefCell::new(matches))))
         }
         "regex_replace" => {
-            // regex_replace(pattern, replacement, text) → str
+            // regex_replace(text, pattern, replacement) → str
+            // text is first so the function is pipe-friendly: text |> regex_replace(pat, repl)
             if args.len() < 3 {
                 return Err(CapError::TooFewArgs { expected: 3, got: args.len(), span: span.clone() });
             }
             let mut args = args;
+            let text = args.remove(0).as_str(span)?.to_string();
             let pattern = args.remove(0).as_str(span)?.to_string();
             let replacement = args.remove(0).as_str(span)?.to_string();
-            let text = args.remove(0).as_str(span)?.to_string();
             let re = regex::Regex::new(&pattern)
                 .map_err(|e| CapError::Runtime { message: format!("regex error: {e}"), span: span.clone() })?;
             Ok(Value::Str(re.replace_all(&text, replacement.as_str()).into_owned()))

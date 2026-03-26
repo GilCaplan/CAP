@@ -541,9 +541,11 @@ impl Parser {
 
     /// Pipe desugaring: `lhs |> f(args)` → `f(lhs, args)`, `lhs |> f` → `f(lhs)`.
     fn parse_pipe_rhs(&mut self, lhs: Expr, op_span: Span) -> Result<Expr, CapError> {
-        // Parse at the right BP of |> (6) — high enough to stop at the next |>
-        // (left BP 5) but low enough to include call arguments (postfix BP 80).
-        let rhs = self.parse_expr(6)?;
+        // Parse at PREFIX_BP (60): high enough to exclude arithmetic (+,-,*,/,**) from
+        // the RHS so that `a |> f / n` parses as `(a |> f) / n` rather than
+        // `a |> (f / n)`.  Postfix ops (call, index, field access) are still included
+        // because they have binding power 80 > 60.
+        let rhs = self.parse_expr(PREFIX_BP)?;
         match rhs.node {
             // `lhs |> f(args)` → `f(lhs, args)`
             ExprKind::Call { callee, mut args, kwargs } => {
